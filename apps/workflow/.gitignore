@@ -1,0 +1,8 @@
+# Local env files
+.env
+
+# Testing
+coverage
+
+# Supabase
+__pycache__
