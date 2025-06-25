@@ -1,0 +1,16 @@
+{
+	"name": "db",
+	"private": true,
+	"type": "module",
+	"scripts": {
+		"generate": "drizzle-kit generate:pg --out ./migrations --schema ./schema.ts"
+	},
+	"dependencies": {
+		"drizzle-orm": "^0.30.0",
+		"drizzle-kit": "^0.20.0",
+		"postgres": "^3.4.4"
+	},
+	"devDependencies": {
+		"@types/node": "^20.11.17"
+	}
+}

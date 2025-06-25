@@ -1,0 +1,4 @@
+# Supabase
+.temp/
+migrations/meta
+
