@@ -8,6 +8,7 @@ node_modules
 # Local env files
 .env
 .env.local
+.env.shared
 .env.development.local
 .env.test.local
 .env.production.local
@@ -36,3 +37,6 @@ yarn-error.log*
 # Misc
 .DS_Store
 *.pem
+
+# Supabase
+packages/db/supabase/.temp/
