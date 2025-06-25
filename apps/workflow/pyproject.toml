@@ -1,0 +1,49 @@
+[project]
+name = "agentic-leads"
+version = "0.1.0"
+description = "Agentic workflow for automated website prospecting"
+authors = [
+    {name = "Lefa Moffat", email = "lefa@zimablue.io"}
+]
+readme = "README.md"
+requires-python = ">=3.11.12"
+dependencies = [
+    "openai-agents>=0.0.19",
+    "openai>=1.50.0",
+    "playwright>=1.48.0",
+    "beautifulsoup4>=4.12.0",
+    "requests>=2.32.0",
+    "pydantic>=2.9.0",
+    "python-dotenv>=1.0.0",
+    "aiohttp>=3.10.0",
+    "psycopg2-binary>=2.9.0",
+    "sqlalchemy>=2.0.0",
+    "googlesearch-python>=1.2.3",
+    "validators>=0.22.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0.0",
+    "pytest-asyncio>=0.24.0",
+    "black>=24.0.0",
+    "ruff>=0.6.0",
+    "mypy>=1.11.0",
+]
+
+# No build system needed - this is a simple script project, not a package
+[tool.black]
+line-length = 88
+target-version = ['py311']
+
+[tool.ruff]
+select = ["E", "F", "W", "C90", "I", "N", "UP", "YTT", "S", "BLE", "FBT", "B", "A", "COM", "C4", "DTZ", "T10", "EM", "EXE", "FA", "ISC", "ICN", "G", "INP", "PIE", "T20", "PYI", "PT", "Q", "RSE", "RET", "SLF", "SLOT", "SIM", "TID", "TCH", "INT", "ARG", "PTH", "TD", "FIX", "ERA", "PD", "PGH", "PL", "TRY", "FLY", "NPY", "AIR", "PERF", "FURB", "LOG", "RUF"]
+ignore = ["E501", "S101", "T201"]
+line-length = 88
+target-version = "py311"
+
+[tool.mypy]
+python_version = "3.11"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
