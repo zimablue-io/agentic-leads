@@ -8,11 +8,10 @@ from datetime import datetime
 from pathlib import Path
 from typing import Dict, Any, List, Optional
 from urllib.parse import urljoin, urlparse
-
 from playwright.async_api import async_playwright, Page, Browser
 from bs4 import BeautifulSoup
 
-from website_prospector.models.types import Prospect, SiteAnalysis
+from workflows.website_prospector.types import Prospect, SiteAnalysis
 
 logger = logging.getLogger(__name__)
 

@@ -1,6 +1,6 @@
 """Pre-configured audience targeting configurations."""
 
-from website_prospector.models.types import AudienceConfig, AudienceType
+from workflows.website_prospector.types import AudienceConfig, AudienceType
 
 AUDIENCE_CONFIGS = {
     "local_business": AudienceConfig(

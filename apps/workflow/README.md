@@ -1,4 +1,6 @@
-# Website Prospector Workflow - OpenAI Agents SDK PoC
+# Website Prospector & Agentic Workflows
+
+> **2024-07 Refactor:** Workflows are now organised under `apps/workflow/workflows/<name>` and share common helpers in `apps/workflow/agentic_core`. The legacy `main.py` remains for backward-compatibility but will be removed once all logic is ported.
 
 An agentic workflow for discovering and analyzing outdated websites using OpenAI Agents SDK and Playwright.
 

@@ -81,4 +81,70 @@ class JobConsumer:
     # ------------------------------------------------------------------
     def handle_job(self, payload: Dict[str, Any]) -> None:  # noqa: D401
         """Process a single job payload. Override in subclass."""
-        raise NotImplementedError 
+        raise NotImplementedError
+
+
+# ---------------------------------------------------------------------------
+# Persistence helpers used by workflows
+# ---------------------------------------------------------------------------
+
+
+def create_workflow_run(audience_name: str, location: str | None = None) -> str:
+    """Insert a row into ``workflow_runs`` and return its ID."""
+    # Fetch audience id by name
+    aud_resp = (
+        supabase.table("audiences")
+        .select("id")
+        .eq("name", audience_name)
+        .single()
+        .execute()
+    )
+    aud_id = aud_resp.data["id"] if hasattr(aud_resp, "data") else aud_resp["id"]
+
+    run_resp = (
+        supabase.table("workflow_runs")
+        .insert({
+            "audience_id": aud_id,
+            "location": location,
+            "status": "running",
+        })
+        .execute()
+    )
+    run_id = run_resp.data[0]["id"] if hasattr(run_resp, "data") else run_resp[0]["id"]
+    return run_id
+
+
+def complete_workflow_run(run_id: str) -> None:
+    supabase.table("workflow_runs").update({"status": "completed"}).eq("id", run_id).execute()
+
+
+def fail_workflow_run(run_id: str) -> None:
+    supabase.table("workflow_runs").update({"status": "failed"}).eq("id", run_id).execute()
+
+
+def insert_prospects(run_id: str, urls: list[str]):
+    records = [{"workflow_run_id": run_id, "url": u} for u in urls]
+    if records:
+        supabase.table("prospects").insert(records).execute()
+
+
+def insert_site_analyses(prospect_urls: list[str], analyses_json: list[str]):
+    # expects parallel lists same length
+    records = []
+    for url, body in zip(prospect_urls, analyses_json, strict=False):
+        # Find prospect id by url
+        p_resp = supabase.table("prospects").select("id").eq("url", url).single().execute()
+        if not p_resp.data:
+            continue
+        records.append({"prospect_id": p_resp.data["id"], "scores_json": body})
+    if records:
+        supabase.table("site_analyses").insert(records).execute()
+
+
+def insert_contacts(prospect_urls: list[str], contacts_json: list[str]):
+    for url, body in zip(prospect_urls, contacts_json, strict=False):
+        p_resp = supabase.table("prospects").select("id").eq("url", url).single().execute()
+        if not p_resp.data:
+            continue
+        # crude: store full JSON into contacts as a single row type jsonb maybe; else skip
+        supabase.table("contacts").insert({"prospect_id": p_resp.data["id"], "type": "json", "value": body}).execute() 

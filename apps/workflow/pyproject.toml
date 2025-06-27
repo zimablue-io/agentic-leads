@@ -1,5 +1,5 @@
 [project]
-name = "agentic-leads"
+name = "@agentic-leads/workflow-app"
 version = "0.1.0"
 description = "Agentic workflow for automated website prospecting"
 authors = [
