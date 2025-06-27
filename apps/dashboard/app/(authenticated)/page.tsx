@@ -1,5 +1,3 @@
-import { createClient, isSupabaseConfigured } from "@/lib/supabase/server";
-import { redirect } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { LogOut } from "lucide-react";
 import { signOut, startProspectingRun } from "@/lib/actions";
@@ -43,44 +41,7 @@ async function getData(): Promise<{
 	return { runs, audiences: auds };
 }
 
-function StatusBadge({ status }: { status: string | null }) {
-	const color =
-		status === "completed"
-			? "bg-green-600"
-			: status === "running"
-				? "bg-yellow-500"
-				: status === "failed"
-					? "bg-red-600"
-					: "bg-gray-500";
-	return (
-		<span
-			className={`${color} text-white px-2 py-1 rounded text-xs capitalize`}
-		>
-			{status ?? "queued"}
-		</span>
-	);
-}
-
 export default async function Home() {
-	// If Supabase is not configured, show setup message directly
-	if (!isSupabaseConfigured) {
-		return (
-			<div className="flex min-h-screen items-center justify-center bg-[#161616]">
-				<h1 className="text-2xl font-bold mb-4 text-white">
-					Connect Supabase to get started app
-				</h1>
-			</div>
-		);
-	}
-
-	// Auth guard
-	const supabase = await createClient();
-	const {
-		data: { user },
-	} = await supabase.auth.getUser();
-
-	if (!user) redirect("/auth/login");
-
 	// Fetch data for page
 	const { runs, audiences: auds } = await getData();
 
