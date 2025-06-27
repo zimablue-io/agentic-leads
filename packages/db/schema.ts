@@ -3,7 +3,6 @@ import {
 	uuid,
 	text,
 	timestamp,
-	integer,
 	jsonb,
 	varchar,
 } from "drizzle-orm/pg-core";

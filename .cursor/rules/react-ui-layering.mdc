@@ -1,0 +1,19 @@
+---
+description: React UI layering/structure
+globs: 
+alwaysApply: false
+---
+### Primitives (`packages/ui`)
+- Pure presentational React components and design tokens only.
+- **No** business logic, data fetching, or server actions.
+- May use React hooks; remember to add `'use client'` when hooks are present.
+- Export composable variants (e.g. `Button`, `Card`, `CarouselItem`).
+
+### Feature Components (`apps/dashboard`)
+- Screens, feature widgets, server actions, and data-aware hooks.
+- Import primitives from `@ui/*` but **never** from other apps.
+- May import server utilities from `@db/*` or `@supabase/ssr` helpers.
+
+When creating a new component ask yourself: *Could another app reuse this?*  
+If **yes**, place it in `packages/ui`. Otherwise keep it in the `apps/dashboard` tree.
+

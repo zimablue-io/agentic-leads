@@ -1,0 +1,1 @@
+ALTER TABLE audiences ADD CONSTRAINT audiences_name_unique UNIQUE (name); 

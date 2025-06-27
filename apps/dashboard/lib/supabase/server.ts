@@ -1,9 +1,6 @@
-import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
+import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 import { cache } from "react";
-
-console.log("SUPABASE_URL: " + process.env.NEXT_PUBLIC_SUPABASE_URL);
-console.log("SUPABASE_ANON_KEY: " + process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
 
 // Check if Supabase environment variables are available
 export const isSupabaseConfigured =
@@ -13,9 +10,7 @@ export const isSupabaseConfigured =
 	process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY.length > 0;
 
 // Create a cached version of the Supabase client for Server Components
-export const createClient = cache(() => {
-	const cookieStore = cookies();
-
+export const createClient = cache(async () => {
 	if (!isSupabaseConfigured) {
 		console.warn(
 			"Supabase environment variables are not set. Using dummy client."
@@ -30,5 +25,21 @@ export const createClient = cache(() => {
 		};
 	}
 
-	return createServerComponentClient({ cookies: () => cookieStore });
+	const cookieStore = await cookies();
+	return createServerClient(
+		process.env.NEXT_PUBLIC_SUPABASE_URL!,
+		process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+		{
+			cookies: {
+				getAll() {
+					return cookieStore.getAll();
+				},
+				setAll(
+					_cookies: { name: string; value: string; options?: any }[]
+				) {
+					// Server Components cannot modify cookies – middleware does that
+				},
+			},
+		}
+	);
 });

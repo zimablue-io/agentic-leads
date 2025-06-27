@@ -1,16 +1,24 @@
 {
-	"name": "db",
+	"name": "@agentic-leads/db",
+	"version": "0.1.0",
 	"private": true,
-	"type": "module",
+	"main": "src/index.ts",
+	"types": "src/index.ts",
 	"scripts": {
-		"generate": "drizzle-kit generate:pg --out ./migrations --schema ./schema.ts"
+		"generate:types": "supabase gen types typescript --linked --schema public > src/generated.ts",
+		"lint": "eslint . --max-warnings 0",
+		"check-types": "tsc --noEmit"
 	},
 	"dependencies": {
-		"drizzle-orm": "^0.30.0",
-		"drizzle-kit": "^0.20.0",
-		"postgres": "^3.4.4"
+		"@supabase/supabase-js": "latest",
+		"drizzle-orm": "^0.44.2",
+		"pg": "^8.11.3"
 	},
 	"devDependencies": {
-		"@types/node": "^20.11.17"
+		"@agentic-leads/eslint-config": "workspace:*",
+		"@agentic-leads/typescript-config": "workspace:*",
+		"@types/node": "^22",
+		"@types/pg": "^8",
+		"typescript": "^5"
 	}
 }

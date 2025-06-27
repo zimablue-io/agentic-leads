@@ -1,0 +1,10 @@
+{
+	"extends": "@agentic-leads/typescript-config/base.json",
+	"compilerOptions": {
+		"outDir": "dist",
+		"rootDir": "src"
+	},
+	"include": ["src/**/*", "types/**/*"],
+	"exclude": ["node_modules"],
+	"types": ["node"]
+}

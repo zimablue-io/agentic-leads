@@ -299,8 +299,8 @@ async def main():
     # Run a test workflow with local businesses
     await run_prospect_workflow(
         audience_name="local_business",
-        location="San Francisco", 
-        max_prospects=2  # Start small for testing
+        location="Johannesburg", 
+        max_prospects=1  # Start small for testing
     )
 
 

@@ -1,0 +1,7 @@
+-- Seed data for audiences
+INSERT INTO audiences (name, description, config)
+VALUES
+  ('local_business', 'Local service-based businesses (plumbers, dentists, etc.) in a specific city.', '{"search_patterns":["{keyword} {location}","{keyword} near me {location}","best {keyword} {location}","{location} {keyword} services"],"keywords":["plumber","electrician","dentist","lawyer","accountant","real estate agent","contractor","auto repair","veterinarian","restaurant","hair salon","fitness gym","chiropractor"],"max_prospects_per_run":25}'::jsonb),
+  ('ecommerce', 'Small to mid-size e-commerce stores selling physical products online.', '{"search_patterns":["buy {keyword} online","{keyword} online store","{keyword} shop","{keyword} ecommerce"],"keywords":["jewelry","clothing","electronics","home goods","books","sporting goods","beauty products","pet supplies","toys"],"max_prospects_per_run":20}'::jsonb),
+  ('saas', 'B2B SaaS companies offering subscription-based software/services.', '{"search_patterns":["{keyword} software","{keyword} platform","{keyword} solution","{keyword} tools"],"keywords":["project management","crm","accounting","hr","marketing","analytics","communication","design","development"],"max_prospects_per_run":15}'::jsonb)
+ON CONFLICT (name) DO UPDATE SET description = EXCLUDED.description, config = EXCLUDED.config; 

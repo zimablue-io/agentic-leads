@@ -1,0 +1,11 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+- The only allowed Supabase client library is **@supabase/ssr**.
+- **Do not** add or import **@supabase/auth-helpers-nextjs**; it is deprecated.
+- Use `createBrowserClient()` in client components and `createServerClient()` (or helper wrappers) in server components and server actions.
+- Avoid client-side context providers; authentication helpers come from the SSR package directly.
+- Middleware must call `handleAuth()` (from @supabase/ssr) or an equivalent wrapper.
+- All imports should be absolute via the alias `@supabase/ssr` or internal helpers under `@dashboard/lib/supabase/*`.

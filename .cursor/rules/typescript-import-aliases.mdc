@@ -1,0 +1,12 @@
+---
+description: TypeScript imports
+globs: 
+alwaysApply: false
+---
+- Use the TypeScript path aliases defined in the root **tsconfig.base.json**.
+  - `@dashboard/*` → `apps/dashboard/*`
+  - `@ui/*`       → `packages/ui/src/*`
+  - `@db/*`       → `packages/db/*`
+- Any import that crosses a package boundary **must** use its alias; **never** use a relative path such as `../../../packages/db/client`.
+- The ESLint rule `import/no-relative-parent-imports` is enabled and treated as an **error**.
+- When adding a new shared package, expose it with an `@{packageName}/*` alias and document it in `tsconfig.base.json` in **alphabetical order**.
