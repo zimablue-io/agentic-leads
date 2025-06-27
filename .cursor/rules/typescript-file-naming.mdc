@@ -1,0 +1,9 @@
+---
+description: TypesScript file name patterns
+globs: 
+alwaysApply: false
+---
+All TypeScript files **must** use kebab-case for their file names.
+
+✔ Use only lowercase letters, numbers and dashes (e.g. `runs-table.tsx`, `auth-form.ts`).
+✖ Do NOT use camelCase, PascalCase, or underscores (e.g. `RunsTable.tsx` or `auth_Form.tsx`).

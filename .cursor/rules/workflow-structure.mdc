@@ -1,0 +1,24 @@
+---
+description: Workflow structure
+globs: 
+alwaysApply: false
+---
+### Workflow Package Guidelines
+
+1. Each business workflow **must** live under `apps/workflow/workflows/<workflow_name>/` and expose `get_workflow()` returning a subclass of `agentic_core.orchestrator.BaseWorkflow`.
+2. Within a workflow package, follow this structure:
+
+```
+workflows/<name>/
+├─ config.py          # constants & static configs
+├─ types.py           # Pydantic models specific to the workflow
+├─ tools/             # Low-level I/O helpers (Playwright, API calls)
+├─ agents/            # LLM agents that call the tools
+├─ pipeline.py        # `Workflow` class coordinating agents
+└─ tests/             # pytest specs
+```
+
+3. **Tools** should be decorated with `@function_tool` and contain no business logic beyond their specific task.
+4. **Agents** only orchestrate tool calls and never touch database or network directly.
+5. Update the registry in `apps/workflow/workflows/__init__.py` when adding a new workflow.
+6. Imports **must** be absolute, leveraging package names (e.g., `from agentic_core.orchestrator import BaseWorkflow`).

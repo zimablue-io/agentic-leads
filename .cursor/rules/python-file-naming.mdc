@@ -1,0 +1,9 @@
+---
+description: Python file name patterns
+globs: 
+alwaysApply: false
+---
+All Python files **must** use snake_case for their file names.
+
+✔ Use only lowercase letters, numbers and dashes (e.g. `run_main.py`, `auth_form.py`).
+✖ Do NOT use camelCase, PascalCase, or underscores (e.g. `RunsTable.py` or `auth_Form.py`).
