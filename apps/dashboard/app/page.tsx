@@ -7,7 +7,7 @@ import { signOut, startProspectingRun } from "@/lib/actions";
 // DB (server-side)
 import { db, audiences, workflowRuns } from "@agentic-leads/db";
 import { eq, desc } from "drizzle-orm";
-import RunsTable, { RunWithAudience } from "@/components/RunsTable";
+import RunsTable, { RunWithAudience } from "@/components/runs-table";
 
 async function getData(): Promise<{
 	runs: RunWithAudience[];
@@ -49,7 +49,9 @@ function StatusBadge({ status }: { status: string | null }) {
 			? "bg-green-600"
 			: status === "running"
 				? "bg-yellow-500"
-				: "bg-gray-500";
+				: status === "failed"
+					? "bg-red-600"
+					: "bg-gray-500";
 	return (
 		<span
 			className={`${color} text-white px-2 py-1 rounded text-xs capitalize`}
@@ -83,11 +85,11 @@ export default async function Home() {
 	const { runs, audiences: auds } = await getData();
 
 	return (
-		<div className="min-h-screen bg-[#161616] text-white p-8 space-y-10">
+		<div className="min-h-screen p-8 space-y-10">
 			<header className="flex items-center justify-between">
 				<h1 className="text-3xl font-bold">Agentic Leads Dashboard</h1>
 				<form action={signOut}>
-					<Button className="bg-red-600 hover:bg-red-500">
+					<Button variant="destructive">
 						<LogOut className="h-4 w-4 mr-2" /> Sign Out
 					</Button>
 				</form>
@@ -98,7 +100,7 @@ export default async function Home() {
 				<div className="flex gap-4">
 					<select
 						name="audience"
-						className="bg-[#1c1c1c] border-gray-700 rounded px-3 py-2"
+						className="bg-secondary border-border rounded px-3 py-2"
 						required
 					>
 						<option value="" disabled>
@@ -114,7 +116,7 @@ export default async function Home() {
 						type="text"
 						name="location"
 						placeholder="Location (e.g. Johannesburg)"
-						className="bg-[#1c1c1c] border-gray-700 rounded px-3 py-2 flex-1"
+						className="bg-secondary border-border rounded px-3 py-2 flex-1"
 						required
 					/>
 					<input
@@ -123,11 +125,11 @@ export default async function Home() {
 						min="1"
 						max="25"
 						defaultValue={5}
-						className="bg-[#1c1c1c] border-gray-700 rounded px-3 py-2 w-24"
+						className="bg-secondary border-border rounded px-3 py-2 w-24"
 					/>
 					<Button
 						type="submit"
-						className="bg-[#2b725e] hover:bg-[#235e4c]"
+						className="bg-green-700 hover:bg-green-600"
 					>
 						Start Run
 					</Button>
@@ -135,7 +137,7 @@ export default async function Home() {
 			</form>
 
 			{/* Runs list */}
-			<section className="bg-[#1c1c1c] p-4 rounded-lg overflow-x-auto">
+			<section className="bg-card p-4 rounded-lg overflow-x-auto border border-border/60">
 				<h2 className="text-xl font-semibold mb-4">Recent Runs</h2>
 				<RunsTable initialRuns={runs} />
 			</section>

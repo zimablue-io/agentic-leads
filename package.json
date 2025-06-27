@@ -16,7 +16,8 @@
 		"ts-node": "^10.9.2",
 		"tsx": "^4.7.0",
 		"turbo": "^2.5.4",
-		"typescript": "5.8.2"
+		"typescript": "5.8.2",
+		"supabase": "^2.26.9"
 	},
 	"packageManager": "pnpm@9.0.0",
 	"engines": {

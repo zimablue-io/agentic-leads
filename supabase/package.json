@@ -14,7 +14,7 @@
 		"db:pull": "supabase db pull",
 		"db:reset": "supabase db reset",
 		"db:diff": "supabase db diff",
-		"db:seed": "supabase db push --linked --include-seed"
+		"db:seed": "supabase db reset"
 	},
 	"devDependencies": {
 		"supabase": "^2.26.9"

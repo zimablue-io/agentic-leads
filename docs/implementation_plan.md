@@ -1,89 +1,88 @@
-# Implementation Plan: Dashboard Modernisation
+# Implementation Plan
 
-This document describes the **exact** steps we will execute to modernise the `apps/dashboard` application so that it:
+## 1. Phase 1 — Lead Generation & Qualification
 
-- shares configuration with the rest of the monorepo
-- uses clear TypeScript path aliases instead of deep relative imports
-- consumes primitives from `packages/ui`
-- replaces the deprecated **@supabase/auth-helpers-nextjs** package with **@supabase/ssr** (no deprecated code left behind)
-- removes the legacy `apps/web` example entirely
+### 1.1 Database & Schema
 
----
+- Add tables: `performance_audits`, `enrichments`, `outreach_drafts`, `proposals`, `quotes`, `requirements`, `contracts`, `approvals`.
+- Extend existing `prospects` row status fields (e.g. `audit_score`, `qualified` boolean).
 
-## 1 Adopt Shared Configuration Packages (no placeholders)
+### 1.2 Workers & Server Actions
 
-1.  Replace the current `apps/dashboard/tsconfig.json` with a minimal file that **extends** the shared preset:
+- **Performance Audit**: Lighthouse/API → store results in `performance_audits`.
+- **Lead Enrichment**: Clearbit (or similar) → write to `enrichments`.
+- **Outreach Draft**: GPT-generated personalised email using audit & enrichment data.
+- **Proposal & Quote Generators**: Populate `proposals`, `quotes` based on templates + hours estimator.
+- **Requirements Intake Handler**: Webhook receiver to persist answers in `requirements`.
+- **Contract Generator**: Build PDF/Docx from proposal + scope; save in `contracts`.
+- **Client Approval Flow**: Digital-signature provider webhook → mark `approvals` row, transition to Phase 2.
 
-```json
-{
-	"extends": "@agentic-leads/typescript-config/nextjs.json"
-}
-```
+### 1.3 Dashboard UI
 
-This keeps dashboard fully aligned with the TypeScript configuration shipped in `packages/typescript-config` while letting package imports resolve naturally via pnpm workspaces.
+- Prospects list & detail (audit scores, enrichment metadata, contacts).
+- Proposal / Quote viewer with "Send to client" & "Mark approved".
+- Requirements intake status & link sharing.
+- Contract preview & signature status.
 
-2.  **Keep** the existing Tailwind setup inside `apps/dashboard/tailwind.config.ts`; just remove any redundant or duplicated theme definitions as we start re-using primitives from `packages/ui`.
+### 1.4 Realtime & Notifications
 
-## 2 Path Aliases & Import Hygiene
-
-1.  Ensure each internal package you need is declared in `apps/dashboard/package.json` with the workspace wildcard, e.g.
-
-```json
-"dependencies": {
-  "@agentic-leads/ui": "workspace:*",
-  "@agentic-leads/db": "workspace:*"
-}
-```
-
-After that, import directly:
-
-```ts
-import { Button } from "@agentic-leads/ui";
-import { db } from "@agentic-leads/db";
-```
-
-2.  Convert every deep-relative import (e.g. `../../../packages/ui/button`) to the package import shown above. No "TODO" comments may remain.
-3.  Keep the ESLint rule `import/no-relative-parent-imports` set to **error** to forbid crossing package boundaries via relative paths.
-
-## 3 Establish `packages/db` as the Single Source of Truth
-
-1.  Create **packages/db** and move the _working_ code currently under `supabase/` (including Drizzle ORM schema, client helpers, and queue logic) into this package.
-2.  Provide a script `pnpm --filter @agentic-leads/db run generate:types` that invokes `supabase gen types typescript --linked --schema public` and writes the result to `src/generated.ts`. This script must run automatically after any schema migration.
-3.  Ensure all TypeScript code in `apps/dashboard` imports database utilities from `@db/*`.
-4.  Update the Python workflow app to import generated types (or the SQL schema) from `packages/db` if needed instead of duplicating definitions.
-
-## 4 UI Layering
-
-1.  Move all _pure_ primitives from `apps/dashboard/components/ui` to `packages/ui`.
-2.  Keep feature-specific components (e.g. the Runs table) inside `apps/dashboard`.
-3.  Delete any duplicated or legacy component versions—only one canonical implementation should exist.
-
-## 5 Supabase Migration to `@supabase/ssr`
-
-1.  Remove **@supabase/auth-helpers-nextjs** and add **@supabase/ssr**.
-2.  Implement `lib/supabase/{client,server,middleware}.ts` using `createBrowserClient()` and `createServerClient()`—no placeholder code, no console noise.
-3.  Update server actions, middleware, and client hooks to the new API.
-4.  Delete every file or line that references the deprecated helpers.
-
-## 6 Next.js 15 Client / Server Correctness
-
-1.  Scan all files for React hooks; add `'use client'` where necessary or refactor to server components.
-2.  Enable ESLint rules `@next/next/no-async-client-component` and `react-hooks/rules-of-hooks`.
-
-## 7 Delete Legacy `apps/web`
-
-Remove the entire `apps/web` directory and its references from `turbo.json` once the shared configs are confirmed to work.
+- Supabase realtime channels for prospect / proposal status.
+- Email (or Slack) notifications on key transitions (audit ready, proposal sent, approval received).
 
 ---
 
-### Milestone Checklist
+## 2. Phase 2 — App Development
 
-| Milestone                                      | Status |
-| ---------------------------------------------- | ------ |
-| Shared TS & Tailwind configs in place          | ✔     |
-| Import aliases converted                       | ✔     |
-| `packages/db` established & types script ready | ✔     |
-| Supabase fully migrated to `@supabase/ssr`     | ✔     |
-| UI primitives centralised in `packages/ui`     | ✔     |
-| Legacy `apps/web` removed                      | ✔     |
-| React client/server boundaries verified        | ✔     |
+### 2.1 Database & Schema
+
+- Tables: `projects`, `project_versions`, `change_requests`, `feedback`, `deployments`.
+
+### 2.2 Workers & Pipelines
+
+- **LLM Scaffolder**: Generate starter repo from requirements (OpenAI function-calling).
+- **Component Composer**: Map requested features → reusable UI blocks.
+- **Preview Deployment**: Automatic deploy to Vercel; record URL in `deployments`.
+- **Change-Management Worker**: Apply approved change requests, update `project_versions`.
+
+### 2.3 Dashboard UI
+
+- Build progress overview (version timeline, deployment status).
+- Preview links with password protection.
+- Feedback / change request submission & tracking.
+
+### 2.4 Audit & Versioning
+
+- Changelog auto-generation with GPT summaries.
+- Logs persisted for compliance / rollback.
+
+---
+
+## 3. Phase 3 — Client Hand-off
+
+### 3.1 Database & Schema
+
+- Tables: `handoffs`, `credentials`, `documentation_links`, `support_requests`.
+
+### 3.2 Automation
+
+- **Hosting Setup**: DNS, SSL, ENV via Infrastructure-as-Code scripts.
+- **CI/CD Integration**: Configure GitHub Actions (or alternatives) for auto-deploy.
+- **Documentation Generator**: README, technical docs, environment setup.
+- **Post-Handoff Agent**: Endpoint for ongoing questions / future change requests.
+
+### 3.3 Dashboard UI
+
+- Final hand-off checklist with downloadable artefacts.
+- Credential vault (time-boxed access for client).
+- Support request form routing to Post-Handoff agent.
+
+---
+
+## 4. Cross-cutting Concerns
+
+- Authentication & multi-tenant (Supabase Row-Level-Security).
+- Secrets & environment configuration management (Dotenv, Vercel / Supabase secrets).
+- CI pipelines for Node & Python: type-checks, tests, lint, e2e.
+- Observability: structured logging, tracing (OTel), error reporting (Sentry).
+- Notification channels: email, Slack, or Discord integration.
+- Automated data retention & backups.

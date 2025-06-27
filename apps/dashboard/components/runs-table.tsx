@@ -1,7 +1,7 @@
 "use client";
 
 import { supabase } from "@/lib/supabase/client";
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { format } from "date-fns";
 
 export type RunWithAudience = {
@@ -20,8 +20,11 @@ export default function RunsTable({ initialRuns }: Props) {
 	const [rows, setRows] = useState<RunWithAudience[]>(initialRuns);
 
 	useEffect(() => {
+		if (!supabase) return;
+
 		const channel = supabase
 			.channel("runs-feed")
+			// Status updates
 			.on(
 				"postgres_changes",
 				{ event: "UPDATE", schema: "public", table: "workflow_runs" },
@@ -35,6 +38,30 @@ export default function RunsTable({ initialRuns }: Props) {
 					);
 				}
 			)
+			// New run inserts
+			.on(
+				"postgres_changes",
+				{ event: "INSERT", schema: "public", table: "workflow_runs" },
+				async (payload: any) => {
+					const newRun = payload.new;
+
+					const { data: audienceData } = await supabase
+						.from("audiences")
+						.select("name")
+						.eq("id", newRun.audience_id)
+						.single();
+
+					const row: RunWithAudience = {
+						id: newRun.id,
+						status: newRun.status,
+						location: newRun.location,
+						createdAt: newRun.created_at,
+						audienceName: audienceData?.name ?? "",
+					};
+
+					setRows((prev) => [row, ...prev]);
+				}
+			)
 			.subscribe();
 
 		return () => {
@@ -43,9 +70,9 @@ export default function RunsTable({ initialRuns }: Props) {
 	}, []);
 
 	return (
-		<table className="min-w-full text-sm text-left text-gray-400">
+		<table className="min-w-full text-sm text-left text-muted-foreground">
 			<thead>
-				<tr className="border-b border-gray-700">
+				<tr className="border-b border-border">
 					<th className="px-4 py-2">Audience</th>
 					<th className="px-4 py-2">Location</th>
 					<th className="px-4 py-2">Created</th>
@@ -54,7 +81,7 @@ export default function RunsTable({ initialRuns }: Props) {
 			</thead>
 			<tbody>
 				{rows.map((r) => (
-					<tr key={r.id} className="border-b border-gray-800">
+					<tr key={r.id} className="border-b border-border/60">
 						<td className="px-4 py-2">{r.audienceName}</td>
 						<td className="px-4 py-2">{r.location}</td>
 						<td className="px-4 py-2">
@@ -72,7 +99,9 @@ export default function RunsTable({ initialRuns }: Props) {
 										? "bg-green-600"
 										: r.status === "running"
 											? "bg-yellow-500"
-											: "bg-gray-500"
+											: r.status === "failed"
+												? "bg-red-600"
+												: "bg-gray-500"
 								} text-white px-2 py-1 rounded text-xs capitalize`}
 							>
 								{r.status ?? "queued"}
